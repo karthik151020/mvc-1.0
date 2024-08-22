@@ -49,4 +49,4 @@ users.associate = function(models) {
 module.exports = users;
 
 
-//in users model i have written comment 
+//in users model i have written comment but mistaken add in main branch so i am chnaging it feature2
