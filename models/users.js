@@ -47,3 +47,6 @@ users.associate = function(models) {
 };
 
 module.exports = users;
+
+
+//in users
