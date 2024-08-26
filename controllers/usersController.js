@@ -1,12 +1,8 @@
 const express=require("express")
 const route=express.Router()
-const Joi=require("joi")
 const {addingUsers,skippingusers}=require("../businessLogic/userslogic")
 const connection=require("../config")
 const {validateUsers,validateAdditionalInfo,validateUsersSkipping}=require("../middlewares/validateusers");
-const bcrypt = require("bcrypt");
-const users = require("../models/users");
-const additionalinfo = require("../models/additionalUsersInfo");
 
 route.post("/skippingUserWhileAdding", async (req, res) => {
   const usersArray = req.body.usersInfoArray;
