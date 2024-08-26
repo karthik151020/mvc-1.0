@@ -47,4 +47,25 @@ function validateUsers(req,res,next){
     next();
 }
 
-  module.exports={validateUsers,validateAdditionalInfo}
+function validateUsersSkipping(user) {
+    const userValidation = Joi.object({
+      firstName: Joi.string().required(),
+      lastName: Joi.string().required(),
+      mail: Joi.string().email().required(),
+      password: Joi.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/).required(),
+      gender: Joi.string().required(),
+      age: Joi.number().required(),
+      userId: Joi.number(),
+      groupid:Joi.string(),
+      isEmailVerified: Joi.boolean().required(),
+      address: Joi.string(),
+      isprimary:Joi.boolean(),
+      addressType: Joi.string(),
+      paymentMode: Joi.string().required()
+    });
+    
+    const { error } = userValidation.validate(user);
+    return error; 
+  }
+
+  module.exports={validateUsers,validateAdditionalInfo,validateUsersSkipping}
