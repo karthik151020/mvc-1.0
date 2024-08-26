@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const port = 4002
 const connection=require("./config")
-const user=require('./models/users')
+const user=require('./controllers/usersController')
 connection.sync({force:true}).then(()=>{
     console.log("Synced successfully")
 })
@@ -12,7 +12,7 @@ connection.sync({force:true}).then(()=>{
 app.use(express.json())
 const users=require('./controllers/usersController')
 
-app.use('/users',users)
+app.use('/users',user)
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
