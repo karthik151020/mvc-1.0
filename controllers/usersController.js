@@ -1,6 +1,6 @@
 const express=require("express")
 const route=express.Router()
-const {addingUsers,skippingusers}=require("../businessLogic/userslogic")
+const {addingUsers,vlaidatingUsersAndInserting}=require("../businessLogic/userslogic")
 const connection=require("../config")
 const {validateUsers,validateAdditionalInfo,validateUsersSkipping}=require("../middlewares/validateusers");
 
@@ -20,9 +20,9 @@ route.post("/skippingUserWhileAdding", async (req, res) => {
         continue;
       }
       try {
-        await skippingusers(userDetails, transaction);
+         await vlaidatingUsersAndInserting(userDetails);
       } catch (err) {
-        console.log(err);
+        console.log(err)
         continue; 
       }
     }
@@ -41,7 +41,7 @@ route.post("/adduserWithoutSkipping", validateUsers,validateAdditionalInfo,  asy
   const transaction = await connection.transaction();
 
   try {
-      await addingUsers(usersArray, transaction); 
+      await addingUsers(usersArray); 
       await transaction.commit();
       return res.status(200).send({ status: "success", msg: "Users added successfully" });
   } catch (err) {

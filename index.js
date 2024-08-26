@@ -10,7 +10,6 @@ connection.sync({force:true}).then(()=>{
     console.log("Not synced")
 })
 app.use(express.json())
-const users=require('./controllers/usersController')
 
 app.use('/users',user)
 

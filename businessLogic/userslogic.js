@@ -20,7 +20,7 @@ async function addingUsers(usersArray, transaction) {
                 password: usersArray[i].password,
                 gender: usersArray[i].gender,
                 age: usersArray[i].age
-            }, { transaction });
+            });
 
             await additionalinfo.create({
                 userId: usersArray[i].userId,
@@ -28,7 +28,7 @@ async function addingUsers(usersArray, transaction) {
                 address: usersArray[i].address,
                 addressType: usersArray[i].addressType,
                 paymentMode: usersArray[i].paymentMode
-            }, { transaction });
+            });
 
         } catch (err) {
             throw err; 
@@ -37,29 +37,29 @@ async function addingUsers(usersArray, transaction) {
 }
 
 
-async function skippingusers(user, transaction) {
-    try {
-      await users.create({
-        id: user.userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        mail: user.mail,
-        password: user.password,
-        gender: user.gender,
-        age: user.age
-      }, { transaction });
+async function vlaidatingUsersAndInserting(user) {
+  try {
+    await users.create({
+      id: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      mail: user.mail,
+      password: user.password,
+      gender: user.gender,
+      age: user.age
+    });
   
-      await additionalinfo.create({
-        userId: user.userId,
-        isEmailVerified: user.isEmailVerified,
-        address: user.address,
-        addressType: user.addressType,
-        paymentMode: user.paymentMode
-      }, { transaction });
-    } catch (error) {
-      throw error;
-    }
+    await additionalinfo.create({
+      userId: user.userId,
+      isEmailVerified: user.isEmailVerified,
+      address: user.address,
+      addressType: user.addressType,
+      paymentMode: user.paymentMode
+    });
+  } catch (error) {
+    throw error;
   }
+}
   
 
-module.exports = { addingUsers,skippingusers };
+module.exports = { addingUsers,vlaidatingUsersAndInserting };
