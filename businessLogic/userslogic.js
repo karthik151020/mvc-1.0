@@ -37,4 +37,29 @@ async function addingUsers(usersArray, transaction) {
 }
 
 
-module.exports = { addingUsers };
+async function skippingusers(user, transaction) {
+    try {
+      await users.create({
+        id: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        mail: user.mail,
+        password: user.password,
+        gender: user.gender,
+        age: user.age
+      }, { transaction });
+  
+      await additionalinfo.create({
+        userId: user.userId,
+        isEmailVerified: user.isEmailVerified,
+        address: user.address,
+        addressType: user.addressType,
+        paymentMode: user.paymentMode
+      }, { transaction });
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+
+module.exports = { addingUsers,skippingusers };
