@@ -1,4 +1,6 @@
 const Joi=require("joi");
+const jwt = require('jsonwebtoken');
+const obj=require("../constvalues");
 
 function validateUsers(req,res,next){
     const usersArray = req.body.usersInfoArray;
@@ -82,4 +84,53 @@ function validateUsersSkipping(user) {
     next()
   }
 
-  module.exports={validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin}
+  function validateUserSignup(req,res,next){
+    const userValidation = Joi.object({
+      firstname: Joi.string().required(),
+      lastname: Joi.string().required(),
+      mail: Joi.string().email().required(),
+      password: Joi.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/).required(),
+      gender: Joi.string().required(),
+      age: Joi.number().required(),
+      isprimary:Joi.boolean(),
+      groupid:Joi.string()
+    });
+
+    const obj={
+      firstname:req.body.firstname,
+      lastname:req.body.lastname,
+      mail:req.body.mail,
+      password:req.body.password,
+      gender:req.body.gender,
+      age:req.body.age,
+      groupid:req.body.groupid
+
+    }
+    if (req.body.isprimary === undefined) {
+      obj.isprimary = false;
+    }
+
+    const {error}=userValidation.validate(obj)
+    if(error){
+      res.status(422).send({status:"failure",msg:error.message})
+    }
+    next()
+  }
+
+
+function authinticationfunction(req,res,next){
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ status: "failure", msg: "Authorization header is required" });
+  }
+  const parts = authHeader.split(" ");
+  const token = parts[1];
+  const verify=jwt.verify(token,obj.jwtPassword)
+  if(!verify){
+    res.status(401).send({status:"failure",msg:"Authintication token is required"});
+  }
+
+  next();
+}
+
+  module.exports={authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup}

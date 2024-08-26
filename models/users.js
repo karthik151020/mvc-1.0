@@ -8,10 +8,10 @@ const users = connection.define("user", {
         primaryKey: true,
         autoIncrement: true
     },
-    firstName: {
+    firstname: {
         type: DataTypes.STRING(50)
     },
-    lastName: {
+    lastname: {
         type: DataTypes.STRING(50)
     },
     mail: {

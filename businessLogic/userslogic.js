@@ -15,8 +15,8 @@ async function addingUsers(usersArray, transaction) {
         try {
             await users.create({
                 id: usersArray[i].userId,
-                firstName: usersArray[i].firstName,
-                lastName: usersArray[i].lastName,
+                firstname: usersArray[i].firstName,
+                lastname: usersArray[i].lastName,
                 mail: usersArray[i].mail,
                 password: usersArray[i].password,
                 gender: usersArray[i].gender,
@@ -42,8 +42,8 @@ async function vlaidatingUsersAndInserting(user) {
   try {
     await users.create({
       id: user.userId,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstname: user.firstname,
+      lastname: user.lastname,
       mail: user.mail,
       password: user.password,
       gender: user.gender,
@@ -83,6 +83,18 @@ async function checkingUserPresentOrNot(username, password) {
     throw err;
   }
 }
+
+async function addingUserUsingSignupRoute(obj) {
+  try{
+    const details=obj;
+    details.password=await bcrypt.hash(details.password,10)
+    await users.create(details)
+    await userlogin.create({username:details.mail,password:details.password})
+  }
+  catch(err){
+    throw err
+  }
+}
   
 
-module.exports = { addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot };
+module.exports = { addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute };

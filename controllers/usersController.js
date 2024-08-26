@@ -1,10 +1,12 @@
 const express=require("express")
 const route=express.Router()
-const {addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot}=require("../businessLogic/userslogic")
+const {addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute}=require("../businessLogic/userslogic")
 const connection=require("../config")
-const {validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin}=require("../middlewares/validateusers");
+const {authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup}=require("../middlewares/validateusers");
 const jwt = require('jsonwebtoken');
 const obj=require("../constvalues");
+
+
 
 route.post("/signin",validateUserLogin,async(req,res)=>{
   try{
@@ -18,6 +20,37 @@ route.post("/signin",validateUserLogin,async(req,res)=>{
     return res.status(422).send({status:"failure",msg:err.message})
   }
 
+})
+
+route.post("/signup",validateUserSignup,async(req,res)=>{
+  const obj={
+    firstname:req.body.firstname,
+    lastname:req.body.lastname,
+    mail:req.body.mail,
+    password:req.body.password,
+    gender:req.body.gender,
+    age:req.body.age,
+    groupid:req.body.groupid
+  }
+  if (req.body.isprimary == undefined || req.body.isprimary == null) {
+    obj.isprimary = false;
+  }
+  try{
+    await addingUserUsingSignupRoute(obj)
+    res.status(200).send({status:"success",msg:"successfully inserted the user information"})
+  }
+  catch(err){
+    res.status(422).send({status:"failure",msg:err.message})
+  }
+})
+
+route.get("/users",authinticationfunction,async(req,res)=>{
+    try{
+      res.send("no user")
+    }
+    catch(err){
+      res.status(422).send({status:"failure",msg:err.message})
+    }
 })
 
 route.post("/skippingUserWhileAdding", async (req, res) => {
