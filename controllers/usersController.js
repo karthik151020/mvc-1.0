@@ -1,6 +1,6 @@
 const express=require("express")
 const route=express.Router()
-const {addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute}=require("../businessLogic/userslogic")
+const {getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute}=require("../businessLogic/userslogic")
 const connection=require("../config")
 const {authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup}=require("../middlewares/validateusers");
 const jwt = require('jsonwebtoken');
@@ -46,11 +46,23 @@ route.post("/signup",validateUserSignup,async(req,res)=>{
 
 route.get("/users",authinticationfunction,async(req,res)=>{
     try{
-      res.send("no user")
+      const details=await getAllUsers();
+      res.status(200).send({status:"failure",msg:"got all the users",details})
     }
     catch(err){
       res.status(422).send({status:"failure",msg:err.message})
     }
+})
+
+route.get("/users/:id",authinticationfunction,async(req,res)=>{
+  try{
+    const userId=req.params.id;
+    const details=await getAllUsers();
+    res.status(200).send({status:"failure",msg:"got all the users",details})
+  }
+  catch(err){
+    res.status(422).send({status:"failure",msg:err.message})
+  }
 })
 
 route.post("/skippingUserWhileAdding", async (req, res) => {

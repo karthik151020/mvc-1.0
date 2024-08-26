@@ -95,6 +95,19 @@ async function addingUserUsingSignupRoute(obj) {
     throw err
   }
 }
-  
 
-module.exports = { addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute };
+async function getAllUsers() {
+  const usersinfo=await users.findAll()
+  return usersinfo
+}
+  
+async function getUsersById(id){
+  const usersinfo=await users.findOne({
+    where:{
+      id:id
+    }
+  })
+  return usersinfo
+}
+
+module.exports = {getUsersById, getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute };
