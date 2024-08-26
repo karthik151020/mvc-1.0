@@ -19,7 +19,7 @@ const additionalUsersInfo = connection.define("additionalUsersInfo", {
     },
     paymentMode: {
         type: DataTypes.STRING(20)
-    }
+    },
 }, {
     timestamps: false,
 

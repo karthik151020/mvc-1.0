@@ -2,6 +2,7 @@
 const bcrypt = require("bcrypt");
 const users = require("../models/users");
 const additionalinfo = require("../models/additionalUsersInfo");
+const userlogin=require("../models/userlogin")
 
 async function addingUsers(usersArray, transaction) {
     for (let i = 0; i < usersArray.length; i++) {
@@ -60,6 +61,28 @@ async function vlaidatingUsersAndInserting(user) {
     throw error;
   }
 }
+async function checkingUserPresentOrNot(username, password) {
+  try {
+    const userDetails = await userlogin.findOne({
+      where: {
+        username: username
+      }
+    });
+    
+    if (!userDetails) {
+      throw new Error("User with this usename not found");
+    }
+    
+    const comparingPassword = await bcrypt.compare(password, userDetails.password);
+    if (!comparingPassword) {
+      throw new Error("Password mismatch");
+    }
+
+    
+  } catch (err) {
+    throw err;
+  }
+}
   
 
-module.exports = { addingUsers,vlaidatingUsersAndInserting };
+module.exports = { addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot };

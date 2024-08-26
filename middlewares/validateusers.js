@@ -68,4 +68,18 @@ function validateUsersSkipping(user) {
     return error; 
   }
 
-  module.exports={validateUsers,validateAdditionalInfo,validateUsersSkipping}
+  function validateUserLogin(req,res,next){
+    const user={username:req.body.username,password:req.body.password}
+    const validations=Joi.object({
+      username:Joi.string().required(),
+      password:Joi.string().min(8).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/).required()
+    })
+
+    const {error}=validations.validate(user)
+    if(error){
+      res.status(422).send({status:"failure",msg:error.message})
+    }
+    next()
+  }
+
+  module.exports={validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin}

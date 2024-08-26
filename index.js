@@ -3,6 +3,7 @@ const app = express()
 const port = 4002
 const connection=require("./config")
 const user=require('./controllers/usersController')
+const userlogin=require("./models/userlogin");
 connection.sync({force:true}).then(()=>{
     console.log("Synced successfully")
 })
