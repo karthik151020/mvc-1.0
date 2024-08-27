@@ -1,13 +1,11 @@
 const express=require("express")
 const route=express.Router()
-const {getUsersById,getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute,deleteAllUsers}=require("../businessLogic/userslogic")
+const {getUsersById,getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute,deleteAllUsers}=require("../service/userslogic")
 const connection=require("../config")
 const {authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup,roleBasedAccess}=require("../middlewares/validateusers");
 const jwt = require('jsonwebtoken');
 const obj=require("../constvalues");
-const roleobj=require("../access")
-
-
+const roleobj=require("../roleAccessObject");
 
 route.post("/signin",validateUserLogin,async(req,res)=>{
   try{
@@ -15,7 +13,11 @@ route.post("/signin",validateUserLogin,async(req,res)=>{
     const password=req.body.password
     await checkingUserPresentOrNot(username,password);
     const verify=jwt.sign({username:req.body.username},obj.jwtPassword,{expiresIn:obj.expiresIn});
-    return res.send({status:"success",token:verify})
+    res.cookie("token",verify,{
+      httpOnly: true,
+      sameSite: 'Strict'
+    })
+    return res.send({status:"success",msg:"Sign in successful"})
   }
   catch(err){
     return res.status(422).send({status:"failure",msg:err.message})
@@ -24,19 +26,19 @@ route.post("/signin",validateUserLogin,async(req,res)=>{
 })
 
 route.post("/signup",validateUserSignup,async(req,res)=>{
-  const obj={
-    firstname:req.body.firstname,
-    lastname:req.body.lastname,
-    mail:req.body.mail,
-    password:req.body.password,
-    gender:req.body.gender,
-    age:req.body.age,
-    groupid:req.body.groupid
-  }
-  if (req.body.isprimary == undefined || req.body.isprimary == null) {
-    obj.isprimary = false;
-  }
   try{
+    const obj={
+      firstname:req.body.firstname,
+      lastname:req.body.lastname,
+      mail:req.body.mail,
+      password:req.body.password,
+      gender:req.body.gender,
+      age:req.body.age,
+      groupid:req.body.groupid
+    }
+    if (req.body.isprimary == undefined || req.body.isprimary == null) {
+      obj.isprimary = false;
+    }
     await addingUserUsingSignupRoute(obj)
     res.status(200).send({status:"success",msg:"successfully inserted the user information"})
   }
@@ -45,28 +47,28 @@ route.post("/signup",validateUserSignup,async(req,res)=>{
   }
 })
 
-route.get("/getallUsers",roleBasedAccess(roleobj.getallUsers),authinticationfunction,async(req,res)=>{
+route.get("/getallUsers",authinticationfunction,roleBasedAccess(roleobj.getallUsers),async(req,res)=>{
     try{
       const details=await getAllUsers();
-      res.status(200).send({status:"success",msg:"got all the users",details})
+      res.status(200).send({status:"success",msg:"Got all the users",details})
     }
     catch(err){
       res.status(422).send({status:"failure",msg:err.message})
     }
 })
 
-route.get("/userById/:id",roleBasedAccess(roleobj.userById),authinticationfunction,async(req,res)=>{
+route.get("/userById/:id",authinticationfunction,roleBasedAccess(roleobj.userById),async(req,res)=>{
   try{
     const userId=req.params.id;
     const details=await getUsersById(userId);
-    res.status(200).send({status:"success",msg:"got all the users",details})
+    res.status(200).send({status:"success",msg:"Got the detials of the users",details})
   }
   catch(err){
     res.status(422).send({status:"failure",msg:err.message})
   }
 })
 
-route.delete("/deleteAllUsers",roleBasedAccess(roleobj.getallUsers),authinticationfunction,async(req,res)=>{
+route.delete("/deleteAllUsers",authinticationfunction,roleBasedAccess(roleobj.getallUsers),async(req,res)=>{
   try{
     deleteAllUsers();
   }

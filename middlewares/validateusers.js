@@ -120,23 +120,19 @@ function validateUsersSkipping(user) {
 
 function authinticationfunction(req,res,next){
   try{
-    const headres=req.headers;
-    if(!headres){
-      return res.status(400).send({status:"failure",msg:"Headers are required"})
+    const isCookiePresent=req.cookies;
+    if(!isCookiePresent){
+      return res.status(400).send({status:"failure",msg:"Cookies are required"})
     }
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(400).send({ status: "failure", msg: "Authorization header is required" });
+    const isTokenPresent = req.cookies.token;
+    if (!isTokenPresent) {
+      return res.status(400).send({ status: "failure", msg: "In Cookies token is required" });
     }
-    if(authHeader==""){
-      return res.status(400).send({ status: "failure", msg: "Authorization header is required" });
+    if(isTokenPresent==""){
+      return res.status(400).send({ status: "failure", msg: "Cookies token should not be empty" });
     }
-    const parts = authHeader.split(" ");
-    const token = parts[1];
-    if(token==""){
-      return res.status(400).send({ status: "failure", msg: "Authorization header is required" });
-    }
-    const verify=jwt.verify(token,obj.jwtPassword)
+    
+    const verify=jwt.verify(isTokenPresent,obj.jwtPassword)
     if(!verify){
       res.status(401).send({status:"failure",msg:"Please signin again"});
     }
@@ -149,12 +145,13 @@ function authinticationfunction(req,res,next){
 
 function roleBasedAccess(role){
   return async(req,res,next)=>{
-    const listOfRoles=role
-    const roleOfthePerson=req.body.role;
+    let listOfRolesCanAccess=role
+    let roleOfthePerson=req.body.role;
+    listOfRolesCanAccess=listOfRolesCanAccess.map((a)=>(a.toLowerCase()))
     if(!roleOfthePerson){
       return res.status(400).send({status:"failure",msg:"Users role is not provided"})
     }
-    if(listOfRoles.includes(roleOfthePerson)){
+    if(listOfRolesCanAccess.includes(roleOfthePerson.toLowerCase())){
       next();
     }
     else{
