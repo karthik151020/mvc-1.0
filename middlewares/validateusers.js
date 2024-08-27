@@ -119,18 +119,48 @@ function validateUsersSkipping(user) {
 
 
 function authinticationfunction(req,res,next){
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).send({ status: "failure", msg: "Authorization header is required" });
+  try{
+    const headres=req.headers;
+    if(!headres){
+      return res.status(400).send({status:"failure",msg:"Headers are required"})
+    }
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(400).send({ status: "failure", msg: "Authorization header is required" });
+    }
+    if(authHeader==""){
+      return res.status(400).send({ status: "failure", msg: "Authorization header is required" });
+    }
+    const parts = authHeader.split(" ");
+    const token = parts[1];
+    if(token==""){
+      return res.status(400).send({ status: "failure", msg: "Authorization header is required" });
+    }
+    const verify=jwt.verify(token,obj.jwtPassword)
+    if(!verify){
+      res.status(401).send({status:"failure",msg:"Please signin again"});
+    }
+    next();
   }
-  const parts = authHeader.split(" ");
-  const token = parts[1];
-  const verify=jwt.verify(token,obj.jwtPassword)
-  if(!verify){
-    res.status(401).send({status:"failure",msg:"Authintication token is required"});
+  catch(err){
+    return res.status(500).send({status:"failure",msg:err.message})
   }
-
-  next();
 }
 
-  module.exports={authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup}
+function roleBasedAccess(role){
+  return async(req,res,next)=>{
+    const listOfRoles=role
+    const roleOfthePerson=req.body.role;
+    if(!roleOfthePerson){
+      return res.status(400).send({status:"failure",msg:"Users role is not provided"})
+    }
+    if(listOfRoles.includes(roleOfthePerson)){
+      next();
+    }
+    else{
+      return res.status(403).send({status:"failure",msg:"User will not be access to this route"})
+    }
+  }
+}
+
+  module.exports={roleBasedAccess,authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup}

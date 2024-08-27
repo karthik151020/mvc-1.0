@@ -110,4 +110,13 @@ async function getUsersById(id){
   return usersinfo
 }
 
-module.exports = {getUsersById, getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute };
+async function deleteAllUsers() {
+  try{
+    await users.destroy();
+  }
+  catch(err){
+    throw err
+  }
+}
+
+module.exports = {deleteAllUsers,getUsersById, getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute };

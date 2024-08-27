@@ -1,10 +1,11 @@
 const express=require("express")
 const route=express.Router()
-const {getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute}=require("../businessLogic/userslogic")
+const {getUsersById,getAllUsers,addingUsers,vlaidatingUsersAndInserting,checkingUserPresentOrNot,addingUserUsingSignupRoute,deleteAllUsers}=require("../businessLogic/userslogic")
 const connection=require("../config")
-const {authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup}=require("../middlewares/validateusers");
+const {authinticationfunction,validateUsers,validateAdditionalInfo,validateUsersSkipping,validateUserLogin,validateUserSignup,roleBasedAccess}=require("../middlewares/validateusers");
 const jwt = require('jsonwebtoken');
 const obj=require("../constvalues");
+const roleobj=require("../access")
 
 
 
@@ -14,7 +15,7 @@ route.post("/signin",validateUserLogin,async(req,res)=>{
     const password=req.body.password
     await checkingUserPresentOrNot(username,password);
     const verify=jwt.sign({username:req.body.username},obj.jwtPassword,{expiresIn:obj.expiresIn});
-    return res.send(verify)
+    return res.send({status:"success",token:verify})
   }
   catch(err){
     return res.status(422).send({status:"failure",msg:err.message})
@@ -44,21 +45,30 @@ route.post("/signup",validateUserSignup,async(req,res)=>{
   }
 })
 
-route.get("/users",authinticationfunction,async(req,res)=>{
+route.get("/getallUsers",roleBasedAccess(roleobj.getallUsers),authinticationfunction,async(req,res)=>{
     try{
       const details=await getAllUsers();
-      res.status(200).send({status:"failure",msg:"got all the users",details})
+      res.status(200).send({status:"success",msg:"got all the users",details})
     }
     catch(err){
       res.status(422).send({status:"failure",msg:err.message})
     }
 })
 
-route.get("/users/:id",authinticationfunction,async(req,res)=>{
+route.get("/userById/:id",roleBasedAccess(roleobj.userById),authinticationfunction,async(req,res)=>{
   try{
     const userId=req.params.id;
-    const details=await getAllUsers();
-    res.status(200).send({status:"failure",msg:"got all the users",details})
+    const details=await getUsersById(userId);
+    res.status(200).send({status:"success",msg:"got all the users",details})
+  }
+  catch(err){
+    res.status(422).send({status:"failure",msg:err.message})
+  }
+})
+
+route.delete("/deleteAllUsers",roleBasedAccess(roleobj.getallUsers),authinticationfunction,async(req,res)=>{
+  try{
+    deleteAllUsers();
   }
   catch(err){
     res.status(422).send({status:"failure",msg:err.message})
